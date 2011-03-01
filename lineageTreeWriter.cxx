@@ -17,11 +17,14 @@
 #include <vtkIdTypeArray.h>
 #include <vtkDoubleArray.h>
 
-
 // Write the tree
 #include <vtkTreeWriter.h>
- 
-int main (int, char *[] )
+
+// vtkQT tree view
+#include <QApplication>
+#include <vtkQtTreeView.h>
+
+int main (int argc, char *argv[])
 {
  
   vtkSmartPointer<vtkMutableDirectedGraph> graph = 
@@ -32,6 +35,7 @@ int main (int, char *[] )
   vtkIdType d = graph->AddChild(b);
   vtkIdType e = graph->AddChild(c);
   vtkIdType f = graph->AddChild(c);
+  vtkIdType g = graph->AddChild(c);
 
   vtkSmartPointer<vtkPoints> points =
       vtkSmartPointer<vtkPoints>::New();
@@ -41,6 +45,7 @@ int main (int, char *[] )
   points->InsertNextPoint(0.0, 0.0, 2.0);
   points->InsertNextPoint(0.0, 1.0, 2.0);
   points->InsertNextPoint(1.0, 0.0, 2.0);
+  points->InsertNextPoint(1.0, 3.0, 2.0);
   graph->SetPoints(points);
 
   vtkSmartPointer<vtkStringArray> cellType =
@@ -52,6 +57,7 @@ int main (int, char *[] )
   cellType->InsertValue(d, "TypeD");
   cellType->InsertValue(e, "TypeE");
   cellType->InsertValue(f, "TypeF");
+  cellType->InsertValue(g, "TypeG");
   graph->GetVertexData()->AddArray(cellType);
  
   vtkSmartPointer<vtkFloatArray> size =
@@ -63,6 +69,7 @@ int main (int, char *[] )
   size->InsertValue(d, 4);
   size->InsertValue(e, 5);
   size->InsertValue(f, 6);
+  size->InsertValue(g, 7);
   graph->GetVertexData()->AddArray(size);
 
   vtkSmartPointer<vtkIntArray> gfps =
@@ -74,6 +81,7 @@ int main (int, char *[] )
   gfps->InsertValue(d, 4000);
   gfps->InsertValue(e, 5000);
   gfps->InsertValue(f, 6000);
+  gfps->InsertValue(g, 7000);
   graph->GetVertexData()->AddArray(gfps);
 
   vtkSmartPointer<vtkIdTypeArray> pedigree =
@@ -85,32 +93,34 @@ int main (int, char *[] )
   pedigree->InsertValue(d, 40004);
   pedigree->InsertValue(e, 50005);
   pedigree->InsertValue(f, 60006);
+  pedigree->InsertValue(g, 70007);
   graph->GetVertexData()->AddArray(pedigree);
 
   vtkSmartPointer<vtkDoubleArray> start =
       vtkSmartPointer<vtkDoubleArray>::New();
   start->SetName("StartTime");
-  start->InsertValue(a, 1001);
-  start->InsertValue(b, 2002);
-  start->InsertValue(c, 3003);
-  start->InsertValue(d, 4004);
-  start->InsertValue(e, 5005);
-  start->InsertValue(f, 6006);
+  start->InsertValue(a, 0);
+  start->InsertValue(b, 12);
+  start->InsertValue(c, 13);
+  start->InsertValue(d, 20);
+  start->InsertValue(e, 20);
+  start->InsertValue(f, 21);
+  start->InsertValue(g, 22);
   graph->GetVertexData()->AddArray(start);
 
   vtkSmartPointer<vtkDoubleArray> end =
       vtkSmartPointer<vtkDoubleArray>::New();
   end->SetName("EndTime");
-  end->InsertValue(a, 10091);
-  end->InsertValue(b, 20092);
-  end->InsertValue(c, 30093);
-  end->InsertValue(d, 40094);
-  end->InsertValue(e, 50095);
-  end->InsertValue(f, 60096);
+  end->InsertValue(a, 10);
+  end->InsertValue(b, 15);
+  end->InsertValue(c, 16);
+  end->InsertValue(d, 25);
+  end->InsertValue(e, 27);
+  end->InsertValue(f, 28);
+  end->InsertValue(g, 30);
   graph->GetVertexData()->AddArray(end);
 
   //graph->GetVertexData()->SetActiveScalars("size");
-
 
   vtkSmartPointer<vtkTree> tree = 
     vtkSmartPointer<vtkTree>::New();
@@ -129,6 +139,16 @@ int main (int, char *[] )
   writer->SetInput(tree);
   writer->SetFileName("lineageTree.vtk");
   writer->Write();
+
+  // QT Application
+  // vtkQT tree view
+  QApplication app(argc, argv);
+  QCoreApplication::setOrganizationName("MegasonLab");
+  QCoreApplication::setOrganizationDomain("http://gofigure2.sourceforge.net");
+
+  vtkSmartPointer<vtkQtTreeView> qtTreeView =
+      vtkSmartPointer<vtkQtTreeView>::New();
+  qtTreeView->AddRepresentationFromInput(tree);
 
   return EXIT_SUCCESS;
 }
