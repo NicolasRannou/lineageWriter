@@ -27,6 +27,9 @@
 int main (int argc, char *argv[])
 {
  
+  //////////////////////////////////////////////////
+  // REQUIERED FIELDS
+
   vtkSmartPointer<vtkMutableDirectedGraph> graph = 
     vtkSmartPointer<vtkMutableDirectedGraph>::New();
   vtkIdType a = graph->AddVertex();
@@ -36,17 +39,10 @@ int main (int argc, char *argv[])
   vtkIdType e = graph->AddChild(c);
   vtkIdType f = graph->AddChild(c);
   vtkIdType g = graph->AddChild(c);
+  vtkIdType h = graph->AddChild(f);
+  vtkIdType i = graph->AddChild(f);
 
-  vtkSmartPointer<vtkPoints> points =
-      vtkSmartPointer<vtkPoints>::New();
-  points->InsertNextPoint(0.0, 0.5, 0.0);
-  points->InsertNextPoint(1.0, 0.0, 0.0);
-  points->InsertNextPoint(0.0, 1.0, 0.0);
-  points->InsertNextPoint(0.0, 0.0, 2.0);
-  points->InsertNextPoint(0.0, 1.0, 2.0);
-  points->InsertNextPoint(1.0, 0.0, 2.0);
-  points->InsertNextPoint(1.0, 3.0, 2.0);
-  graph->SetPoints(points);
+  // First array: first column of the graph
 
   vtkSmartPointer<vtkStringArray> cellType =
       vtkSmartPointer<vtkStringArray>::New();
@@ -58,8 +54,41 @@ int main (int argc, char *argv[])
   cellType->InsertValue(e, "TypeE");
   cellType->InsertValue(f, "TypeF");
   cellType->InsertValue(g, "TypeG");
+  cellType->InsertValue(h, "TypeH");
+  cellType->InsertValue(i, "TypeI");
   graph->GetVertexData()->AddArray(cellType);
- 
+
+  // i.e. trackFamilyID for us-> to collapse a part of the tree
+  vtkSmartPointer<vtkIdTypeArray> pedigree =
+      vtkSmartPointer<vtkIdTypeArray>::New();
+  pedigree->SetName("PedigreeVertexId");
+  pedigree->InsertValue(a, 0); //  has to start at 0!
+  pedigree->InsertValue(b, 1);
+  pedigree->InsertValue(c, 2);
+  pedigree->InsertValue(d, 3);
+  pedigree->InsertValue(e, 4);
+  pedigree->InsertValue(f, 5);
+  pedigree->InsertValue(g, 6);
+  pedigree->InsertValue(h, 7);
+  pedigree->InsertValue(i, 8);
+  graph->GetVertexData()->AddArray(pedigree);
+
+  ////////////////////////////////////////////////
+  // ADDITIONAL FIELDS
+
+  vtkSmartPointer<vtkPoints> points =
+      vtkSmartPointer<vtkPoints>::New();
+  points->InsertNextPoint(0.0, 0.5, 0.0);
+  points->InsertNextPoint(1.0, 0.0, 0.0);
+  points->InsertNextPoint(0.0, 1.0, 0.0);
+  points->InsertNextPoint(0.0, 0.0, 2.0);
+  points->InsertNextPoint(0.0, 1.0, 2.0);
+  points->InsertNextPoint(1.0, 0.0, 2.0);
+  points->InsertNextPoint(1.0, 3.0, 2.0);
+  points->InsertNextPoint(1.0, 2.0, 5.0);
+  points->InsertNextPoint(3.0, 1.0, 2.0);
+  graph->SetPoints(points);
+
   vtkSmartPointer<vtkFloatArray> size =
       vtkSmartPointer<vtkFloatArray>::New();
   size->SetName("size");
@@ -70,6 +99,8 @@ int main (int argc, char *argv[])
   size->InsertValue(e, 5);
   size->InsertValue(f, 6);
   size->InsertValue(g, 7);
+  size->InsertValue(h, 8);
+  size->InsertValue(i, 9);
   graph->GetVertexData()->AddArray(size);
 
   vtkSmartPointer<vtkIntArray> gfps =
@@ -82,19 +113,9 @@ int main (int argc, char *argv[])
   gfps->InsertValue(e, 5000);
   gfps->InsertValue(f, 6000);
   gfps->InsertValue(g, 7000);
+  gfps->InsertValue(h, 8000);
+  gfps->InsertValue(i, 9000);
   graph->GetVertexData()->AddArray(gfps);
-
-  vtkSmartPointer<vtkIdTypeArray> pedigree =
-      vtkSmartPointer<vtkIdTypeArray>::New();
-  pedigree->SetName("PedigreeVertexId");
-  pedigree->InsertValue(a, 10001);
-  pedigree->InsertValue(b, 20002);
-  pedigree->InsertValue(c, 30003);
-  pedigree->InsertValue(d, 40004);
-  pedigree->InsertValue(e, 50005);
-  pedigree->InsertValue(f, 60006);
-  pedigree->InsertValue(g, 70007);
-  graph->GetVertexData()->AddArray(pedigree);
 
   vtkSmartPointer<vtkDoubleArray> start =
       vtkSmartPointer<vtkDoubleArray>::New();
@@ -106,6 +127,8 @@ int main (int argc, char *argv[])
   start->InsertValue(e, 20);
   start->InsertValue(f, 21);
   start->InsertValue(g, 22);
+  start->InsertValue(h, 30);
+  start->InsertValue(i, 31);
   graph->GetVertexData()->AddArray(start);
 
   vtkSmartPointer<vtkDoubleArray> end =
@@ -118,9 +141,41 @@ int main (int argc, char *argv[])
   end->InsertValue(e, 27);
   end->InsertValue(f, 28);
   end->InsertValue(g, 30);
+  end->InsertValue(h, 43);
+  end->InsertValue(i, 37);
   graph->GetVertexData()->AddArray(end);
 
-  //graph->GetVertexData()->SetActiveScalars("size");
+  vtkSmartPointer<vtkDoubleArray> length =
+      vtkSmartPointer<vtkDoubleArray>::New();
+  length->SetName("Length");
+  length->InsertValue(a, 10);
+  length->InsertValue(b, 15);
+  length->InsertValue(c, 16);
+  length->InsertValue(d, 25);
+  length->InsertValue(e, 27);
+  length->InsertValue(f, 28);
+  length->InsertValue(g, 30);
+  length->InsertValue(h, 12);
+  length->InsertValue(i, 11);
+  graph->GetVertexData()->AddArray(length);
+
+  vtkSmartPointer<vtkDoubleArray> xPos =
+      vtkSmartPointer<vtkDoubleArray>::New();
+  xPos->SetName("XPos");
+  xPos->InsertValue(a, 113);
+  xPos->InsertValue(b, 51);
+  xPos->InsertValue(c, 21);
+  xPos->InsertValue(d, 1);
+  xPos->InsertValue(e, 51);
+  xPos->InsertValue(f, 5);
+  xPos->InsertValue(g, 7);
+  xPos->InsertValue(h, 116);
+  xPos->InsertValue(i, 219);
+  graph->GetVertexData()->AddArray(xPos);
+
+  //graph->GetVertexData()->SetActiveScalars("XPos");
+
+  //graph->GetVertexData()->SetActiveScalars("XPos");
 
   vtkSmartPointer<vtkTree> tree = 
     vtkSmartPointer<vtkTree>::New();
